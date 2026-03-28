@@ -40,7 +40,7 @@ exports.storage = multer.diskStorage({
 
 exports.createPost = async (req, res) => {
   try {
-    const url = req.protocol + "://" + req.get("host");
+    const url = process.env.BACKEND_URL;
     const post = await Post.create({
       imagePath: `${url}/images/${req.file.filename}`,
       description: req.body.description,
