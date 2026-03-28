@@ -3,6 +3,7 @@ node_modules/
 
 # Environment variables
 .env
+dev.env
 .env.*
 !.env.example
 
@@ -21,7 +22,7 @@ pids
 # Coverage
 coverage/
 
-# Build output (ako ikad budeš buildao)
+# Build output
 dist/
 build/
 

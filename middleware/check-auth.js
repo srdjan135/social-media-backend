@@ -14,7 +14,6 @@ module.exports = (req, res, next) => {
 
     next();
   } catch (error) {
-    console.log("AUTH:", req.headers.authorization);
     return res.status(401).json({ message: "Invalid or expired token!" });
   }
 };

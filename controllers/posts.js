@@ -26,7 +26,10 @@ function deleteImageFromServer(imageUrl) {
 exports.storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const isValid = MIME_TYPE_MAP[file.mimetype];
-    cb(isValid ? null : new Error("Invalid mime type"), "backend/images");
+    cb(
+      isValid ? null : new Error("Invalid mime type"),
+      path.join(__dirname, "..", "images"),
+    );
   },
   filename: (req, file, cb) => {
     const name = file.originalname.toLowerCase().split(" ").join("-");
@@ -65,7 +68,9 @@ exports.getPosts = async (req, res) => {
     const posts = await Post.find({ userId: { $in: feedUsers } });
 
     res.status(200).json({ posts });
-  } catch {
+  } catch (err) {
+    console.log(err);
+
     res.status(500).json({ message: "Fetching posts failed" });
   }
 };
@@ -95,7 +100,7 @@ exports.likePost = async (req, res) => {
           Notification.deleteOne({ _id: notification._id }),
           User.updateOne(
             { _id: recipientId },
-            { $pull: { notifications: notification._id } }
+            { $pull: { notifications: notification._id } },
           ),
         ]);
       }
@@ -113,7 +118,7 @@ exports.likePost = async (req, res) => {
 
       await User.updateOne(
         { _id: recipientId },
-        { $push: { notifications: likeNotification._id } }
+        { $push: { notifications: likeNotification._id } },
       );
 
       io.getIO().to(recipientId.toString()).emit("notifications", {
@@ -157,9 +162,9 @@ exports.deletePost = async (req, res) => {
       notifications.map((n) =>
         User.updateOne(
           { notifications: n._id },
-          { $pull: { notifications: n._id } }
-        )
-      )
+          { $pull: { notifications: n._id } },
+        ),
+      ),
     );
 
     await Promise.all([
@@ -174,7 +179,7 @@ exports.deletePost = async (req, res) => {
           posts: post._id,
           comments: { $in: commentIds },
         },
-      }
+      },
     );
 
     deleteImageFromServer(post.imagePath);
